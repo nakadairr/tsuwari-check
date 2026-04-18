@@ -239,9 +239,8 @@
       </div>
     </div>
 
-    <div class="ad-slot">
+    <div class="ad-slot" id="ad-mid">
       <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3985655020038392" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
     <!-- OK/NG/Watch -->
@@ -263,9 +262,8 @@
       → <strong>妊娠悪阻</strong>の可能性あり。入院が必要なこともあります。
     </div>
 
-    <div class="ad-slot">
+    <div class="ad-slot" id="ad-bottom">
       <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3985655020038392" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
   </div>
@@ -500,6 +498,16 @@ function calculate() {
     </div>`).join('');
 
   document.getElementById('result').style.display = '';
+
+  // Push ads after result is visible (avoid pushing into display:none elements)
+  ['ad-mid','ad-bottom'].forEach(id => {
+    const slot = document.getElementById(id);
+    if (slot && !slot.dataset.adPushed) {
+      slot.dataset.adPushed = '1';
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  });
+
   document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 </script>
