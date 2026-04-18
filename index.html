@@ -499,7 +499,7 @@ function calculate() {
       return '<div class="tip-card"><div class="tip-icon">' + tip.icon + '</div><h4>' + tip.h + '</h4><p>' + tip.p + '</p></div>';
     }).join('');
 
-    document.getElementById('result').style.display = '';
+    document.getElementById('result').style.display = 'block';
 
     // Push result ads after making visible
     ['ad-mid','ad-bottom'].forEach(function(id) {
@@ -514,7 +514,7 @@ function calculate() {
 
   } catch(e) {
     document.getElementById('result').innerHTML = '<div style="padding:20px;color:red;background:#fff;border-radius:12px;margin-top:16px;">エラー: ' + e.message + '</div>';
-    document.getElementById('result').style.display = '';
+    document.getElementById('result').style.display = 'block';
   }
 }
 </script>
