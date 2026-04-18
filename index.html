@@ -162,9 +162,8 @@
 
 <main>
 
-  <div class="ad-slot">
+  <div class="ad-slot" id="ad-top">
     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3985655020038392" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 
   <div class="card">
@@ -191,9 +190,8 @@
 
   <button class="calc-btn" onclick="calculate()">🤢 今のつわり状況をチェック</button>
 
-  <div class="ad-slot" style="margin-top:20px;">
+  <div class="ad-slot" id="ad-below-btn" style="margin-top:20px;">
     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3985655020038392" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 
   <div id="result">
@@ -318,6 +316,14 @@
 </footer>
 
 <script>
+// Initialize always-visible ads after DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  } catch(e) {}
+});
+
 // ── Data ──────────────────────────────────────────────
 const DATA = {
   pre: {
@@ -450,65 +456,66 @@ function getWeek() {
 
 // ── Calculate ────────────────────────────────────────
 function calculate() {
-  const w = getWeek();
-  if (w === null) return;
-  const week = Math.max(4, Math.min(w, 20));
+  try {
+    const w = getWeek();
+    if (w === null) return;
+    const week = Math.max(4, Math.min(w, 20));
 
-  const phase = getPhase(week);
-  const d = DATA[phase];
+    const phase = getPhase(week);
+    const d = DATA[phase];
 
-  // Progress bar
-  const pct = Math.min(((week - 4) / 12) * 100, 100);
-  document.getElementById('prog-fill').style.width = pct + '%';
-  const marker = document.getElementById('prog-marker');
-  marker.style.left = pct + '%';
-  document.getElementById('prog-dot').textContent = week + 'w';
-  document.getElementById('result-week-title').textContent = `妊娠 ${week} 週のつわり状況`;
+    // Progress bar
+    const pct = Math.min(((week - 4) / 12) * 100, 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    const marker = document.getElementById('prog-marker');
+    marker.style.left = pct + '%';
+    document.getElementById('prog-dot').textContent = week + 'w';
+    document.getElementById('result-week-title').textContent = '\u599A\u5A20 ' + week + ' \u9031\u306E\u3064\u308F\u308A\u72B6\u6CC1';
 
-  // Status
-  const sc = document.getElementById('status-card');
-  sc.className = `status-card ${d.status}`;
-  document.getElementById('status-icon').textContent = d.icon;
-  document.getElementById('status-title').textContent = d.title;
-  document.getElementById('status-desc').textContent = d.desc;
+    // Status
+    const sc = document.getElementById('status-card');
+    sc.className = 'status-card ' + d.status;
+    document.getElementById('status-icon').textContent = d.icon;
+    document.getElementById('status-title').textContent = d.title;
+    document.getElementById('status-desc').textContent = d.desc;
 
-  // End prediction
-  document.getElementById('end-week').textContent = d.endWeek;
-  document.getElementById('end-note').textContent = d.end;
+    // End prediction
+    document.getElementById('end-week').textContent = d.endWeek;
+    document.getElementById('end-note').textContent = d.end;
 
-  // Symptoms
-  document.getElementById('symptom-common').innerHTML =
-    d.common.map(s => `<span class="chip common">${s}</span>`).join('');
-  document.getElementById('symptom-sometimes').innerHTML =
-    d.sometimes.map(s => `<span class="chip sometimes">${s}</span>`).join('');
+    // Symptoms
+    document.getElementById('symptom-common').innerHTML =
+      d.common.map(function(s){ return '<span class="chip common">' + s + '</span>'; }).join('');
+    document.getElementById('symptom-sometimes').innerHTML =
+      d.sometimes.map(function(s){ return '<span class="chip sometimes">' + s + '</span>'; }).join('');
 
-  // Judges
-  document.getElementById('judge-grid').innerHTML = d.judges.map(j => `
-    <div class="judge-item ${j.ok ? 'ok' : 'ng'}">
-      <div class="judge-icon">${j.icon}</div>
-      <div class="judge-body"><h4>${j.h}</h4><p>${j.p}</p></div>
-    </div>`).join('');
+    // Judges
+    document.getElementById('judge-grid').innerHTML = d.judges.map(function(j){
+      return '<div class="judge-item ' + (j.ok ? 'ok' : 'ng') + '"><div class="judge-icon">' + j.icon + '</div><div class="judge-body"><h4>' + j.h + '</h4><p>' + j.p + '</p></div></div>';
+    }).join('');
 
-  // Tips
-  document.getElementById('tips-grid').innerHTML = d.tips.map(t => `
-    <div class="tip-card">
-      <div class="tip-icon">${t.icon}</div>
-      <h4>${t.h}</h4>
-      <p>${t.p}</p>
-    </div>`).join('');
+    // Tips
+    document.getElementById('tips-grid').innerHTML = d.tips.map(function(tip){
+      return '<div class="tip-card"><div class="tip-icon">' + tip.icon + '</div><h4>' + tip.h + '</h4><p>' + tip.p + '</p></div>';
+    }).join('');
 
-  document.getElementById('result').style.display = '';
+    document.getElementById('result').style.display = '';
 
-  // Push ads after result is visible (avoid pushing into display:none elements)
-  ['ad-mid','ad-bottom'].forEach(id => {
-    const slot = document.getElementById(id);
-    if (slot && !slot.dataset.adPushed) {
-      slot.dataset.adPushed = '1';
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    }
-  });
+    // Push result ads after making visible
+    ['ad-mid','ad-bottom'].forEach(function(id) {
+      var slot = document.getElementById(id);
+      if (slot && !slot.dataset.adPushed) {
+        slot.dataset.adPushed = '1';
+        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(ae) {}
+      }
+    });
 
-  document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'start' });
+    document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'start' });
+
+  } catch(e) {
+    document.getElementById('result').innerHTML = '<div style="padding:20px;color:red;background:#fff;border-radius:12px;margin-top:16px;">エラー: ' + e.message + '</div>';
+    document.getElementById('result').style.display = '';
+  }
 }
 </script>
 </body>
